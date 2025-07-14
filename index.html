@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>🎨 MMCA Chatbot - 시나리오 UX 개선</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+    }
+    #container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      border: 1px solid #ccc;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 1em;
+      text-align: center;
+    }
+    #nav {
+      display: flex;
+      justify-content: space-around;
+      background: #ddd;
+    }
+    #nav button {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      background: #eee;
+    }
+    #chat {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .message {
+      margin: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 80%;
+      position: relative;
+      display: inline-block;
+      word-break: break-word;
+    }
+    .user {
+      background: #d0ebff;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+    .bot {
+      background: #e9ecef;
+      align-self: flex-start;
+      margin-right: auto;
+    }
+    .system {
+      background: #f1f1f1;
+      align-self: center;
+      font-size: 14px;
+      color: #666;
+    }
+    #inputArea {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ccc;
+    }
+    #inputArea input {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+    }
+    #inputArea button {
+      padding: 10px 12px;
+      margin-left: 5px;
+      font-size: 16px;
+      border: none;
+      background: #444;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #voiceStatus {
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      padding-bottom: 8px;
+      height: 20px;
+    }
+    .chat-image {
+      max-width: 120px;
+      display: block;
+      margin-top: 8px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: 0.3s;
+    }
+    .chat-image:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+<div id="container">
+  <header>🎨 MMCA UX 실험 - 시나리오 선택형</header>
+  <div id="nav">
+    <button onclick="startScenario(0)">Scenario 1</button>
+    <button onclick="startScenario(1)">Scenario 2</button>
+    <button onclick="startScenario(2)">Scenario 3</button>
+  </div>
+  <div id="chat"></div>
+  <div id="voiceStatus"></div>
+  <div id="inputArea">
+    <input id="userInput" type="text" placeholder="텍스트 입력">
+    <button onclick="submitInput(false)">💬 전송</button>
+    <button id="voiceBtn" onclick="toggleVoice()">🎤 음성</button>
+    <button onclick="downloadLog()">📁 로그 저장</button>
+  </div>
+</div>
+
+<script>
+let currentScenarioIndex = -1;
+let scenarioStarted = false;
+let responded = false;
+let logData = [];
+let recognition = null;
+let isListening = false;
+
+function appendMessage(text, cls, imagePath = null) {
+  const chat = document.getElementById("chat");
+  const div = document.createElement("div");
+  div.className = "message " + cls;
+  div.innerHTML = text;
+  if (imagePath) {
+    const img = document.createElement("img");
+    img.src = imagePath;
+    img.alt = "관련 이미지";
+    img.className = "chat-image";
+    img.onclick = () => window.open(imagePath, "_blank");
+    div.appendChild(img);
+  }
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function startScenario(index) {
+  currentScenarioIndex = index;
+  scenarioStarted = true;
+  responded = false;
+  document.getElementById("chat").innerHTML = "";
+  document.getElementById("voiceStatus").innerText = "";
+  document.getElementById("userInput").value = "";
+  appendMessage("💡 궁금한 것을 물어보세요.", "system");
+}
+
+function submitInput(isVoice = false) {
+  if (!scenarioStarted) return;
+  const inputField = document.getElementById("userInput");
+  const userText = inputField.value.trim();
+  if (!userText) return;
+  inputField.value = "";
+  appendMessage((isVoice ? "🎤 " : "🙋 ") + userText, "user");
+  respondWithBot(userText, isVoice);
+}
+
+function respondWithBot(inputText, isVoice = false) {
+  let botText = "죄송합니다. 아직 학습되지 않은 질문입니다.";
+  let img = null;
+
+  if (inputText.includes("문신")) {
+    botText = "문신은 전통 음악 작곡가입니다.";
+    img = "images/mmca1.jpg";
+  } else if (inputText.includes("언제")) {
+    botText = "작품 제작 연도는 1984년입니다.";
+    img = "images/mmca2.jpg";
+  } else if (inputText.includes("출신")) {
+    botText = "서울 출신입니다.";
+    img = "images/mmca3.jpg";
+  }
+
+  const time = new Date().toISOString();
+  logData.push({
+    scenario: currentScenarioIndex + 1,
+    input: inputText,
+    inputType: isVoice ? "voice" : "text",
+    response: botText,
+    image: img,
+    timestamp: time
+  });
+
+  setTimeout(() => appendMessage("🤖 " + botText, "bot", img), 500);
+  responded = true;
+}
+
+function toggleVoice() {
+  const voiceBtn = document.getElementById("voiceBtn");
+  const voiceStatus = document.getElementById("voiceStatus");
+  const inputField = document.getElementById("userInput");
+
+  if (!isListening) {
+    // 초기화
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      voiceStatus.textContent = "❌ 음성 인식이 지원되지 않습니다.";
+      return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.lang = "ko-KR";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    voiceStatus.textContent = "🎙️ 음성 인식 중... 다시 버튼을 눌러 제출";
+    voiceBtn.textContent = "✅ 인식 완료";
+    isListening = true;
+
+    recognition.onresult = function(event) {
+      const result = event.results[0][0].transcript;
+      inputField.value = result;
+      console.log("🟢 인식된 문장:", result);
+    };
+
+    recognition.onerror = function(event) {
+      console.error("🔴 오류 발생:", event.error);
+      voiceStatus.textContent = "❌ 오류: " + event.error;
+      isListening = false;
+      voiceBtn.textContent = "🎤 음성";
+    };
+
+    recognition.onend = function() {
+      console.log("🔚 인식 종료됨");
+    };
+
+    recognition.start();
+  } else {
+    recognition.stop();
+    voiceStatus.textContent = "🎤 인식 완료됨. 전송 중...";
+    voiceBtn.textContent = "🎤 음성";
+    isListening = false;
+    submitInput(true);
+  }
+}
+
+function downloadLog() {
+  const blob = new Blob([JSON.stringify(logData, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `chat_log_scenario${currentScenarioIndex + 1}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById("userInput").addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    submitInput(false);
+  }
+});
+</script>
+</body>
+</html>
