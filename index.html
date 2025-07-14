@@ -110,6 +110,13 @@
   </style>
 </head>
 <body>
+
+<div style="padding: 10px; background: #f5f5f5; text-align: center;">
+  <label for="participantName">참여자 이름: </label>
+  <input id="participantName" type="text" placeholder="이름을 입력하세요" style="padding:5px; font-size:14px;">
+</div>
+
+
 <div id="container">
   <header>🎨 MMCA UX 실험 - 시나리오 선택형</header>
   <div id="nav">
@@ -251,14 +258,21 @@ function toggleVoice() {
 }
 
 function downloadLog() {
-  const blob = new Blob([JSON.stringify(logData, null, 2)], { type: "application/json" });
+  const name = document.getElementById("participantName").value.trim() || "anonymous";
+  const fullLog = {
+    participant: name,
+    logs: logData
+  };
+
+  const blob = new Blob([JSON.stringify(fullLog, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `chat_log_scenario${currentScenarioIndex + 1}.json`;
+  a.download = `chat_log_${name}_${currentScenarioIndex + 1}.json`;
   a.click();
   URL.revokeObjectURL(url);
 }
+
 
 document.getElementById("userInput").addEventListener("keypress", function(event) {
   if (event.key === "Enter") {
