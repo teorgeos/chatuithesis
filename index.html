@@ -18,8 +18,62 @@
       height: 100vh;
       border: 1px solid #ccc;
     }
+
+    /* 🔥 인트로 화면 */
+#introScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #efefef;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.intro-inner {
+  text-align: center;
+}
+
+.intro-sub {
+  font-size: 18px;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.intro-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.intro-image {
+  width: 220px;
+  margin: 30px 0;
+}
+
+.intro-btn {
+  display: block;
+  width: 250px;
+  margin: 10px auto;
+  padding: 15px;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  color: white;
+  background: #FFB54D;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* 🔥 hover 시 색 변경 */
+.intro-btn:hover {
+  background: #FF9500;
+}
     header {
-      background-color: #333;
+      /* background-color: #333; */
       color: white;
       padding: 1em;
       text-align: center;
@@ -69,11 +123,19 @@
       font-size: 14px;
       color: #666;
     }
-    #inputArea {
+    /* #inputArea {
       display: flex;
       padding: 10px;
       border-top: 1px solid #ccc;
-    }
+    } */
+     #inputArea {
+  display: flex;
+  justify-content: center;  /* 🔥 가운데 정렬 */
+  align-items: center;
+  gap: 10px;               /* 버튼 간격 */
+  padding: 10px;
+  border-top: 1px solid #ccc;
+}
     #inputArea input {
       flex: 1;
       padding: 10px;
@@ -107,30 +169,55 @@
     .chat-image:hover {
       transform: scale(1.05);
     }
+
+    #logBtnHeader {
+  background: none;      /* 배경 제거 */
+  border: none;          /* 테두리 제거 */
+  outline: none;         /* 클릭 시 외곽선 제거 */
+  box-shadow: none;      /* 혹시 있을 그림자 제거 */
+  
+  color: white;          /* 글자 흰색 */
+  font-size: 14px;
+  cursor: pointer;
+}
+
+
   </style>
 </head>
 <body>
 
-<div style="padding: 10px; background: #f5f5f5; text-align: center;">
+<!-- <div style="padding: 10px; background: #f5f5f5; text-align: center;">
   <label for="participantName">참여자 이름: </label>
   <input id="participantName" type="text" placeholder="이름을 입력하세요" style="padding:5px; font-size:14px;">
+</div> -->
+
+<!-- 🔥 인트로 화면 -->
+<div id="introScreen">
+  <div class="intro-inner">
+    <div class="intro-sub">공공미술관 챗봇</div>
+    <div class="intro-title">에게 물어봐!</div>
+
+    <img src="main.png" class="intro-image" />
+
+ <button class="intro-btn" onclick="enterChatVoice()">음성으로 대화하기</button>
+<button class="intro-btn" onclick="enterChatKeyboard()">키보드로 대화하기</button>
+  </div>
 </div>
 
-
 <div id="container">
-  <header>🎨 MMCA UX 실험 - 시나리오 선택형</header>
-  <div id="nav">
+  <header> <button id="logBtnHeader" onclick="downloadLog()">로그 저장</button> <br></header>
+  <!-- <div id="nav">
     <button onclick="startScenario(0)">Scenario 1</button>
     <button onclick="startScenario(1)">Scenario 2</button>
     <button onclick="startScenario(2)">Scenario 3</button>
-  </div>
+  </div> -->
   <div id="chat"></div>
-  <div id="voiceStatus"></div>
+ <div id="voiceStatus" style="display:none;"></div>
   <div id="inputArea">
     <input id="userInput" type="text" placeholder="텍스트 입력">
     <button onclick="submitInput(false)">💬 전송</button>
     <button id="voiceBtn" onclick="toggleVoice()">🎤 음성</button>
-    <button onclick="downloadLog()">📁 로그 저장</button>
+    <!-- <button onclick="downloadLog()">📁 로그 저장</button> -->
   </div>
 </div>
 
@@ -175,24 +262,62 @@ function submitInput(isVoice = false) {
   const userText = inputField.value.trim();
   if (!userText) return;
   inputField.value = "";
-  appendMessage((isVoice ? "🎤 " : "🙋 ") + userText, "user");
+  // appendMessage((isVoice ? "🎤 " : "🙋 ") + userText, "user");
+  appendMessage(userText, "user");
+
   respondWithBot(userText, isVoice);
 }
 
 function respondWithBot(inputText, isVoice = false) {
-  let botText = "죄송합니다. 아직 학습되지 않은 질문입니다.";
+  let botText = "죄송합니다. 다시 한 번 질문해주세요.";
   let img = null;
 
-  if (inputText.includes("문신")) {
-    botText = "문신은 전통 음악 작곡가입니다.";
-    img = "images/mmca1.jpg";
-  } else if (inputText.includes("언제")) {
-    botText = "작품 제작 연도는 1984년입니다.";
-    img = "images/mmca2.jpg";
-  } else if (inputText.includes("출신")) {
-    botText = "서울 출신입니다.";
-    img = "images/mmca3.jpg";
-  }
+  // if (inputText.includes("문신")) {
+  //   botText = "문신은 일본에서 태어나 한국과 프랑스 등 여러 나라를 오가며 화가이자 조각가로 활동한 이방인이자 경계의 초월자였습니다. 그는 삶과 예술, 동서양, 전통과 현대 등 다양한 이분법적 경계를 넘나들며 독창적인 예술세계를 구축했습니다. 이번 회고전 ‘우주를 향하여’는 그의 유랑과 탐색, 창조적 에너지를 조명하며 동시대에 새로운 자극을 던집니다.";
+  //   img = "images/mmca1.jpg";
+  // } else if (inputText.includes("언제")) {
+  //   botText = "작품 제작 연도는 1984년입니다.";
+  //   img = "images/mmca2.jpg";
+  // } else if (inputText.includes("의미")) {
+  //   botText = "문신 작가의 작품 중 '개미'는 작가의 어린 시절 경험과 깊은 연관이 있는 작품입니다. 작가는 유년 시절 마산에서 개미를 비롯한 곤충들을 관찰하며 자연의 섭리와 생명에 대한 깊은 관심을 갖게 되었고, 이를 작품에 담아냈습니다. 특히, 개미의 생태를 관찰하며 좌우의 미세한 차이가 성장 과정에서 자연스럽게 나타나는 현상이라는 점을 깨달았다고 합니다. 문신 작가의 '개미' 작품은 이러한 자연의 법칙과 생명의 근원에 대한 작가의 고민을 담고 있으며, 그의 추상 조각 작품 세계를 이해하는 중요한 열쇠가 됩니다.";
+  //   img = "images/mmca3.jpg";
+  // }
+  if (inputText.includes("미인도")) {
+  botText = "‘미인도’는 조선 후기 화가 신윤복이 그린 대표적인 풍속화로, 한 여인의 모습을 통해 당시의 미적 기준과 분위기를 담아낸 작품입니다. 인물의 자세와 표정, 옷차림을 통해 조선 시대 여성의 이상적인 아름다움을 표현한 것이 특징입니다. 또한 섬세한 선과 절제된 색채로 우아하고 차분한 분위기를 전달하며, 인물의 내면적인 감정까지 암시적으로 드러낸다는 점에서 중요한 의미를 가집니다.";
+  // img = "images/mindodo.jpg";
+
+} else if (inputText.includes("신윤복")) {
+  botText = "신윤복은 조선 후기의 대표적인 풍속화가로, ‘혜원’이라는 호로도 잘 알려져 있습니다. 그는 도화서에서 활동하며 당시 사회의 모습을 섬세하게 표현했으며, 특히 여성과 연인, 여가 생활 등 인간의 감정과 관계를 중심으로 한 장면을 많이 그렸습니다. 그의 작품은 부드러운 선과 세련된 구도로 높은 평가를 받고 있습니다.";
+  // img = "images/shinyunbok.jpg";
+
+} else if (inputText.includes("전시")) {
+  botText = "현재 박물관에서는 다양한 주제의 전시가 진행되고 있습니다. 대표적으로 보존과학, 기증유물전, 백자 이야기 등의 전시가 운영 중입니다. 각 전시는 서로 다른 주제를 다루고 있어 관심에 따라 선택해 관람하실 수 있습니다. 전시마다 위치와 기간이 다르므로, 이동 전 안내 표지판을 확인하시면 도움이 됩니다.";
+  // img = "images/exhibition.jpg";
+
+} else if (inputText.includes("시대")) {
+  botText = "‘미인도’와 같은 조선 후기에는 풍속화가 활발하게 제작되었으며, 대표적으로 김홍도의 작품들이 있습니다. 김홍도의 ‘씨름’, ‘서당’과 같은 작품은 당시 사람들의 일상생활을 생동감 있게 표현한 것으로 잘 알려져 있습니다. 이 시기의 작품들은 단순한 기록을 넘어 인간의 생활과 감정을 담아내는 데 초점을 두었으며, 신윤복의 작품과 함께 조선 후기 풍속화의 특징을 잘 보여줍니다.";
+  // img = "images/joseon.jpg";
+
+} else if (inputText.includes("선묘")) {
+  botText = "선묘 기법은 선을 중심으로 형태를 표현하는 전통적인 회화 기법으로, 붓의 굵기와 흐름을 통해 대상의 윤곽과 질감을 나타냅니다. 특히 동아시아 회화에서는 색채보다 선의 표현력이 중요하게 강조됩니다. 이 기법은 간결하면서도 정교한 표현을 가능하게 하며, ‘미인도’에서도 인물의 우아함과 섬세함을 강조하는 데 활용됩니다.";
+  img = "images/line.jpg";
+
+} else if (inputText.includes("불교회화실")) {
+  botText = "불교회화실은 서화관 2층에 있습니다. 안내 표지판을 따라 이동하신 뒤 계단이나 엘리베이터를 이용해 올라가시면, 2층에서 ‘불교회화실’ 표지를 확인하실 수 있습니다. 해당 표지를 따라 복도를 이동하시면 전시실에 도착합니다.";
+  // img = "images/map.jpg";
+}
+// } else if (inputText.includes("문신")) {
+//   botText = "문신은 일본에서 태어나 한국과 프랑스 등 여러 나라를 오가며 화가이자 조각가로 활동한 이방인이자 경계의 초월자였습니다. 그는 삶과 예술, 동서양, 전통과 현대 등 다양한 이분법적 경계를 넘나들며 독창적인 예술세계를 구축했습니다. 이번 회고전 ‘우주를 향하여’는 그의 유랑과 탐색, 창조적 에너지를 조명하며 동시대에 새로운 자극을 던집니다.";
+//   img = "images/mmca1.jpg";
+
+// } else if (inputText.includes("1984")) {
+//   botText = "작품 제작 연도는 1984년입니다.";
+//   img = "images/mmca2.jpg";
+
+// } else if (inputText.includes("문신")) {
+//   botText = "문신 작가의 작품 중 '개미'는 작가의 어린 시절 경험과 깊은 연관이 있는 작품입니다. 작가는 유년 시절 마산에서 개미를 비롯한 곤충들을 관찰하며 자연의 섭리와 생명에 대한 깊은 관심을 갖게 되었고, 이를 작품에 담아냈습니다. 특히, 개미의 생태를 관찰하며 좌우의 미세한 차이가 성장 과정에서 자연스럽게 나타나는 현상이라는 점을 깨달았다고 합니다. 문신 작가의 '개미' 작품은 이러한 자연의 법칙과 생명의 근원에 대한 작가의 고민을 담고 있으며, 그의 추상 조각 작품 세계를 이해하는 중요한 열쇠가 됩니다.";
+//   img = "images/mmca3.jpg";
+// }
 
   const time = new Date().toISOString();
   logData.push({
@@ -204,7 +329,9 @@ function respondWithBot(inputText, isVoice = false) {
     timestamp: time
   });
 
-  setTimeout(() => appendMessage("🤖 " + botText, "bot", img), 500);
+  // setTimeout(() => appendMessage("🤖 " + botText, "bot", img), 500);
+  setTimeout(() => appendMessage(botText, "bot", img), 500);
+
   responded = true;
 }
 
@@ -226,7 +353,7 @@ function toggleVoice() {
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
-    voiceStatus.textContent = "🎙️ 음성 인식 중... 다시 버튼을 눌러 제출";
+    voiceStatus.textContent = "🎙️ 음성 인식 중...";
     voiceBtn.textContent = "✅ 인식 완료";
     isListening = true;
 
@@ -250,7 +377,7 @@ function toggleVoice() {
     recognition.start();
   } else {
     recognition.stop();
-    voiceStatus.textContent = "🎤 인식 완료됨. 전송 중...";
+    voiceStatus.textContent = "🎤 인식 완료됨.";
     voiceBtn.textContent = "🎤 음성";
     isListening = false;
     submitInput(true);
@@ -258,7 +385,8 @@ function toggleVoice() {
 }
 
 function downloadLog() {
-  const name = document.getElementById("participantName").value.trim() || "anonymous";
+  // const name = document.getElementById("participantName").value.trim() || "anonymous";
+  const name = "anonymous";
   const fullLog = {
     participant: name,
     logs: logData
@@ -280,6 +408,52 @@ document.getElementById("userInput").addEventListener("keypress", function(event
     submitInput(false);
   }
 });
+
+function enterChatKeyboard() {
+  document.getElementById("introScreen").style.display = "none";
+
+  // 요소 가져오기
+  const input = document.getElementById("userInput");
+  const sendBtn = document.querySelector('button[onclick="submitInput(false)"]');
+  const voiceBtn = document.getElementById("voiceBtn");
+  const logBtn = document.querySelector('button[onclick="downloadLog()"]');
+  const voiceStatus = document.getElementById("voiceStatus");
+
+  // 키보드 모드
+  input.style.display = "block";
+  sendBtn.style.display = "block";
+  voiceBtn.style.display = "none";
+  logBtn.style.display = "block";
+  voiceStatus.style.display = "none";
+
+  startScenario(0);
+}
+
+
+function enterChatVoice() {
+  document.getElementById("introScreen").style.display = "none";
+
+  const input = document.getElementById("userInput");
+  const sendBtn = document.querySelector('button[onclick="submitInput(false)"]');
+  const voiceBtn = document.getElementById("voiceBtn");
+  const logBtn = document.querySelector('button[onclick="downloadLog()"]');
+  const voiceStatus = document.getElementById("voiceStatus");
+
+  // 음성 모드
+  input.style.display = "none";
+  sendBtn.style.display = "none";
+  voiceBtn.style.display = "block";
+  logBtn.style.display = "block";
+
+  // 🔥 placeholder 대신 텍스트로
+  voiceStatus.style.display = "block";
+  voiceStatus.innerText = "🎤 버튼을 눌러 말하세요";
+
+  startScenario(0);
+}
+// function enterChat() {
+//   document.getElementById("introScreen").style.display = "none";
+// }
 </script>
 </body>
 </html>
