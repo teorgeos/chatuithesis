@@ -10,8 +10,11 @@
       margin: 0;
     }
     #container {
-      max-width: 600px;
-      margin: auto;
+      /* max-width: 600px;
+      margin: auto; */
+       width: 100%;
+  max-width: none;   /* 🔥 이거 추가 */
+  margin: 0;    
       background: white;
       display: flex;
       flex-direction: column;
@@ -102,7 +105,7 @@
       margin: 10px;
       padding: 10px;
       border-radius: 10px;
-      max-width: 80%;
+      max-width: 90%;
       position: relative;
       display: inline-block;
       word-break: break-word;
@@ -118,7 +121,8 @@
       margin-right: auto;
     }
     .system {
-      background: #f1f1f1;
+      /* background: #f1f1f1; */
+      background: #ffffff;
       align-self: center;
       font-size: 14px;
       color: #666;
@@ -134,7 +138,7 @@
   align-items: center;
   gap: 10px;               /* 버튼 간격 */
   padding: 10px;
-  border-top: 1px solid #ccc;
+  /* border-top: 1px solid #ccc; */
 }
     #inputArea input {
       flex: 1;
@@ -158,17 +162,26 @@
       padding-bottom: 8px;
       height: 20px;
     }
-    .chat-image {
+    /* .chat-image {
       max-width: 120px;
       display: block;
       margin-top: 8px;
       cursor: pointer;
       border-radius: 5px;
       transition: 0.3s;
-    }
-    .chat-image:hover {
+    } */
+
+    .chat-image {
+  width: 100%;        /* 🔥 말풍선 너비에 맞춤 */
+  max-width: 100%;    /* 제한 제거 */
+  height: auto;
+  display: block;
+  margin-top: 8px;
+  border-radius: 5px;
+}
+    /* .chat-image:hover {
       transform: scale(1.05);
-    }
+    } */
 
     #logBtnHeader {
   background: none;      /* 배경 제거 */
@@ -194,18 +207,20 @@
 <!-- 🔥 인트로 화면 -->
 <div id="introScreen">
   <div class="intro-inner">
-    <div class="intro-sub">공공미술관 챗봇</div>
-    <div class="intro-title">에게 물어봐!</div>
+    <div class="intro-sub">한국의 미를 찾아가는 길, 미로(美路)</div>
+    <div class="intro-title">무엇이든 물어보세요!</div>
 
-    <img src="main.png" class="intro-image" />
+    <img src="images/miro.png" class="intro-image" />
 
- <button class="intro-btn" onclick="enterChatVoice()">음성으로 대화하기</button>
-<button class="intro-btn" onclick="enterChatKeyboard()">키보드로 대화하기</button>
+ <button class="intro-btn" onclick="enterChatVoice()">음성으로 대화할게요</button>
+<button class="intro-btn" onclick="enterChatKeyboard()">키패드로 대화할게요</button>
   </div>
 </div>
 
 <div id="container">
-  <header> <button id="logBtnHeader" onclick="downloadLog()">로그 저장</button> <br></header>
+  <header> <button id="logBtnHeader" onclick="downloadLog()">로그 저장</button> 
+    <img src="images/mirologo.png" style="height:60px;"></header>
+
   <!-- <div id="nav">
     <button onclick="startScenario(0)">Scenario 1</button>
     <button onclick="startScenario(1)">Scenario 2</button>
@@ -215,8 +230,8 @@
  <div id="voiceStatus" style="display:none;"></div>
   <div id="inputArea">
     <input id="userInput" type="text" placeholder="텍스트 입력">
-    <button onclick="submitInput(false)">💬 전송</button>
-    <button id="voiceBtn" onclick="toggleVoice()">🎤 음성</button>
+    <button onclick="submitInput(false)">전송 💬 </button>
+    <button id="voiceBtn" onclick="toggleVoice()">🎤 말하기</button>
     <!-- <button onclick="downloadLog()">📁 로그 저장</button> -->
   </div>
 </div>
@@ -284,7 +299,8 @@ function respondWithBot(inputText, isVoice = false) {
   // }
   if (inputText.includes("미인도")) {
   botText = "‘미인도’는 조선 후기 화가 신윤복이 그린 대표적인 풍속화로, 한 여인의 모습을 통해 당시의 미적 기준과 분위기를 담아낸 작품입니다. 인물의 자세와 표정, 옷차림을 통해 조선 시대 여성의 이상적인 아름다움을 표현한 것이 특징입니다. 또한 섬세한 선과 절제된 색채로 우아하고 차분한 분위기를 전달하며, 인물의 내면적인 감정까지 암시적으로 드러낸다는 점에서 중요한 의미를 가집니다.";
-  // img = "images/mindodo.jpg";
+  img = "images/miyindo.jpg";
+  
 
 } else if (inputText.includes("신윤복")) {
   botText = "신윤복은 조선 후기의 대표적인 풍속화가로, ‘혜원’이라는 호로도 잘 알려져 있습니다. 그는 도화서에서 활동하며 당시 사회의 모습을 섬세하게 표현했으며, 특히 여성과 연인, 여가 생활 등 인간의 감정과 관계를 중심으로 한 장면을 많이 그렸습니다. 그의 작품은 부드러운 선과 세련된 구도로 높은 평가를 받고 있습니다.";
@@ -296,15 +312,15 @@ function respondWithBot(inputText, isVoice = false) {
 
 } else if (inputText.includes("시대")) {
   botText = "‘미인도’와 같은 조선 후기에는 풍속화가 활발하게 제작되었으며, 대표적으로 김홍도의 작품들이 있습니다. 김홍도의 ‘씨름’, ‘서당’과 같은 작품은 당시 사람들의 일상생활을 생동감 있게 표현한 것으로 잘 알려져 있습니다. 이 시기의 작품들은 단순한 기록을 넘어 인간의 생활과 감정을 담아내는 데 초점을 두었으며, 신윤복의 작품과 함께 조선 후기 풍속화의 특징을 잘 보여줍니다.";
-  // img = "images/joseon.jpg";
+  img = "images/heungdo.png";
 
 } else if (inputText.includes("선묘")) {
   botText = "선묘 기법은 선을 중심으로 형태를 표현하는 전통적인 회화 기법으로, 붓의 굵기와 흐름을 통해 대상의 윤곽과 질감을 나타냅니다. 특히 동아시아 회화에서는 색채보다 선의 표현력이 중요하게 강조됩니다. 이 기법은 간결하면서도 정교한 표현을 가능하게 하며, ‘미인도’에서도 인물의 우아함과 섬세함을 강조하는 데 활용됩니다.";
-  img = "images/line.jpg";
+  // img = "images/line.jpg";
 
-} else if (inputText.includes("불교회화실")) {
+} else if (inputText.includes("불교")) {
   botText = "불교회화실은 서화관 2층에 있습니다. 안내 표지판을 따라 이동하신 뒤 계단이나 엘리베이터를 이용해 올라가시면, 2층에서 ‘불교회화실’ 표지를 확인하실 수 있습니다. 해당 표지를 따라 복도를 이동하시면 전시실에 도착합니다.";
-  // img = "images/map.jpg";
+  img = "images/location.jpg";
 }
 // } else if (inputText.includes("문신")) {
 //   botText = "문신은 일본에서 태어나 한국과 프랑스 등 여러 나라를 오가며 화가이자 조각가로 활동한 이방인이자 경계의 초월자였습니다. 그는 삶과 예술, 동서양, 전통과 현대 등 다양한 이분법적 경계를 넘나들며 독창적인 예술세계를 구축했습니다. 이번 회고전 ‘우주를 향하여’는 그의 유랑과 탐색, 창조적 에너지를 조명하며 동시대에 새로운 자극을 던집니다.";
@@ -353,8 +369,8 @@ function toggleVoice() {
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
-    voiceStatus.textContent = "🎙️ 음성 인식 중...";
-    voiceBtn.textContent = "✅ 인식 완료";
+    voiceStatus.textContent = "🎙️ 음성을 듣고 있어요...";
+    voiceBtn.textContent = "전송하기 ✅ ";
     isListening = true;
 
     recognition.onresult = function(event) {
@@ -367,18 +383,18 @@ function toggleVoice() {
       console.error("🔴 오류 발생:", event.error);
       voiceStatus.textContent = "❌ 오류: " + event.error;
       isListening = false;
-      voiceBtn.textContent = "🎤 음성";
+      voiceBtn.textContent = "말하기";
     };
 
     recognition.onend = function() {
-      console.log("🔚 인식 종료됨");
+      console.log("🔚 인식 종료되었어요");
     };
 
     recognition.start();
   } else {
     recognition.stop();
-    voiceStatus.textContent = "🎤 인식 완료됨.";
-    voiceBtn.textContent = "🎤 음성";
+    voiceStatus.textContent = "인식이 완료되었어요";
+    voiceBtn.textContent = "🎤 말하기";
     isListening = false;
     submitInput(true);
   }
